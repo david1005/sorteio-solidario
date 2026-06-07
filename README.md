@@ -105,11 +105,11 @@ O primeiro objetivo e validar o fluxo principal:
 
 ### Parte 1 - Fundacao do projeto
 
-- Escolher stack.
-- Criar estrutura do projeto.
-- Configurar ambiente.
-- Criar README, roadmap e padrao de commits.
-- Criar layout base.
+- Stack definida: Next.js, TypeScript, Tailwind CSS, PostgreSQL e Prisma.
+- Estrutura inicial do projeto criada.
+- Layout base do painel do organizador criado.
+- Arquivo de ambiente de exemplo criado.
+- Guia de setup criado em `docs/SETUP.md`.
 
 Sugestao de commit:
 
