@@ -144,10 +144,12 @@ feat: add initial database schema
 
 ### Parte 3 - Autenticacao e painel
 
-- Login.
-- Cadastro.
-- Area protegida.
-- Painel inicial do organizador.
+- Cadastro de organizacao.
+- Login com e-mail e senha.
+- Senha armazenada com hash.
+- Sessao assinada em cookie HTTP-only.
+- Area `/painel` protegida.
+- Botao de sair no painel.
 
 Sugestao de commit:
 

@@ -57,6 +57,7 @@ model User {
   name             String
   email            String               @unique
   phone            String?
+  passwordHash     String               @default("")
   role             UserRole             @default(OWNER)
   memberships      OrganizationMember[]
   createdCampaigns Campaign[]           @relation("CampaignCreator")

@@ -60,6 +60,23 @@ Para visualizar os dados:
 npm run db:studio
 ```
 
+## Usuario de exemplo
+
+O seed cria um administrador local:
+
+```text
+E-mail: admin@sorteiosolidario.local
+Senha: admin12345
+```
+
+## Rotas iniciais
+
+```text
+/login
+/cadastro
+/painel
+```
+
 ## Observacao
 
 Nesta etapa o projeto tem a modelagem inicial do banco. A autenticacao entra em uma etapa futura.
