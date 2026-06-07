@@ -119,10 +119,11 @@ chore: initialize project structure
 
 ### Parte 2 - Modelagem e banco de dados
 
-- Definir entidades principais.
-- Criar schema do banco.
-- Criar migrations.
-- Popular dados de exemplo.
+- Prisma adicionado ao projeto.
+- Schema inicial do banco criado.
+- Entidades principais modeladas.
+- Seed inicial criado para campanha de exemplo.
+- Scripts de banco adicionados ao `package.json`.
 
 Entidades iniciais:
 

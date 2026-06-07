@@ -16,10 +16,13 @@ npm install
 
 ## Configurar variaveis de ambiente
 
-Copie `.env.example` para `.env.local` e ajuste os valores conforme o ambiente.
+Copie `.env.example` para `.env.local` e `.env`.
+
+O Next.js usa `.env.local` durante o desenvolvimento. O Prisma CLI usa `.env` para migrations, generate e seed.
 
 ```powershell
 Copy-Item .env.example .env.local
+Copy-Item .env.example .env
 ```
 
 ## Rodar em desenvolvimento
@@ -41,6 +44,22 @@ npm run typecheck
 npm run lint
 ```
 
+## Banco de dados
+
+Depois de configurar um PostgreSQL e preencher `DATABASE_URL`, rode:
+
+```powershell
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+```
+
+Para visualizar os dados:
+
+```powershell
+npm run db:studio
+```
+
 ## Observacao
 
-Nesta primeira parte, o projeto ainda nao tem banco de dados nem autenticacao. A proxima etapa sera modelar as entidades e preparar o Prisma.
+Nesta etapa o projeto tem a modelagem inicial do banco. A autenticacao entra em uma etapa futura.

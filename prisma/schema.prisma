@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  CLOSED
+  DRAWN
+  CANCELED
+}
+
+enum RaffleNumberStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  CANCELED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  EXPIRED
+  CANCELED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  MANUAL
+  MERCADO_PAGO
+  EFI
+  ASAAS
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELED
+  REFUNDED
+}
+
+model User {
+  id               String               @id @default(uuid())
+  name             String
+  email            String               @unique
+  phone            String?
+  role             UserRole             @default(OWNER)
+  memberships      OrganizationMember[]
+  createdCampaigns Campaign[]           @relation("CampaignCreator")
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+}
+
+model Organization {
+  id        String               @id @default(uuid())
+  name      String
+  slug      String               @unique
+  document  String?
+  pixKey    String?
+  members   OrganizationMember[]
+  campaigns Campaign[]
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  role           UserRole     @default(MEMBER)
+  userId         String
+  organizationId String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
+model Campaign {
+  id               String         @id @default(uuid())
+  organizationId   String
+  createdById      String
+  title            String
+  slug             String
+  description      String?
+  prize            String
+  imageUrl         String?
+  numberPriceCents Int
+  totalNumbers     Int
+  drawDate         DateTime?
+  status           CampaignStatus @default(DRAFT)
+  publicRules      String?
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy        User           @relation("CampaignCreator", fields: [createdById], references: [id])
+  numbers          RaffleNumber[]
+  orders           Order[]
+  draw             Draw?
+  expenses         Expense[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@index([status])
+}
+
+model RaffleNumber {
+  id         String             @id @default(uuid())
+  campaignId String
+  orderId    String?
+  number     Int
+  status     RaffleNumberStatus @default(AVAILABLE)
+  reservedAt DateTime?
+  soldAt     DateTime?
+  campaign   Campaign           @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  order      Order?             @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  winnerDraw Draw?              @relation("WinningNumber")
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@unique([campaignId, number])
+  @@index([campaignId, status])
+  @@index([orderId])
+}
+
+model Order {
+  id            String         @id @default(uuid())
+  campaignId    String
+  buyerName     String
+  buyerEmail    String?
+  buyerPhone    String
+  buyerDocument String?
+  totalCents    Int
+  status        OrderStatus    @default(PENDING)
+  expiresAt     DateTime?
+  paidAt        DateTime?
+  campaign      Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  numbers       RaffleNumber[]
+  payment       Payment?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([campaignId])
+  @@index([status])
+  @@index([buyerPhone])
+}
+
+model Payment {
+  id                String          @id @default(uuid())
+  orderId           String          @unique
+  provider          PaymentProvider @default(MANUAL)
+  status            PaymentStatus   @default(PENDING)
+  amountCents       Int
+  pixQrCode         String?
+  pixCopyPaste      String?
+  providerPaymentId String?
+  webhookPayload    Json?
+  confirmedAt       DateTime?
+  order             Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([provider])
+  @@index([status])
+}
+
+model Draw {
+  id              String       @id @default(uuid())
+  campaignId      String       @unique
+  winningNumberId String       @unique
+  winnerName      String
+  winnerPhone     String
+  drawnAt         DateTime     @default(now())
+  auditSeed       String?
+  notes           String?
+  campaign        Campaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  winningNumber   RaffleNumber @relation("WinningNumber", fields: [winningNumberId], references: [id])
+  createdAt       DateTime     @default(now())
+}
+
+model Expense {
+  id          String    @id @default(uuid())
+  campaignId  String
+  description String
+  amountCents Int
+  paidAt      DateTime?
+  receiptUrl  String?
+  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([campaignId])
+}
